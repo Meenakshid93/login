@@ -64,15 +64,15 @@ exports.patchUser = async(name, email, age, id) => {
 }
 
 
-exports.createUsers = async(name, email, passwordData) => {
+exports.createUsers = async(name, email, passwordData,role) => {
 
    // hashing password
   const password = await bcrypt.hash(passwordData, 10);
   const result = await pool.query(
-    `INSERT INTO users (name, email, password)
-     VALUES ($1, $2, $3)
+    `INSERT INTO users (name, email, password,role)
+     VALUES ($1, $2, $3,$4)
      RETURNING *`,
-    [name, email, password]
+    [name, email, password,role]
   );
   return result.rows[0];
 }
@@ -84,4 +84,25 @@ exports.loginUsers = async(email) => {
     );
     console.log("result", result)
     return result.rows[0];
+}
+
+exports.getUserById= async(id)=>{
+  const userData = await pool.query(
+ `SELECT * FROM users WHERE id = $1`,
+      [id]
+  )
+  console.log(userData)
+    return userData.rows[0];
+}
+
+
+exports.deleteUserData= async(id)=>{
+  console.log('...in deleteservice')
+ const deleteUser = await pool.query(
+     `DELETE FROM users
+     WHERE id = $1
+     RETURNING *`,
+    [id])
+    console.log(deleteUser)
+     return deleteUser.rows[0];
 }

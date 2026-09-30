@@ -69,8 +69,8 @@ exports.deleteUser = asyncHandler(async(req, res, next) => {
 });
 
 exports.createUsers = asyncHandler(async(req, res) => {
-    const{name, email , password} = req.body;
-  const users = await userService.createUsers(name,email,password);
+    const{name, email , password,role} = req.body;
+  const users = await userService.createUsers(name,email,password,role);
   res.status(202).json({
     sucess: 'true',
     message: 'User Created sucessfully'
@@ -104,7 +104,8 @@ console.log(user)
   const token = jwt.sign(
       {
         userId: user.id,
-        email: user.email
+        email: user.email,
+        role: user.role
       },
       jwtsecretkey,
       {
@@ -117,4 +118,30 @@ console.log(user)
     token : token
   })
 
+});
+
+exports.getUserProfile=asyncHandler(async(req,res)=> {
+  const id = req.user.userId;
+  const user = await userService.getUserById(id);
+   if (!user) {
+    throw new error ("User not found", 404);
+  }
+
+  res.status(200).json({
+    message: 'user fetched sucessfully',
+    userInfo: user
+  })
+});
+
+
+exports.deleteUserData = asyncHandler(async(req, res) => {
+  console.log('...indelete')
+    const id = req.params.id;
+    const deletedUser = await userService.deleteUserData(id);
+    console.log(deletedUser);
+    res.status(200).json({
+      sucess: true,
+      updatedUserDetails: deletedUser,
+      message: 'User deleted sucessfully'
+    })
 });
